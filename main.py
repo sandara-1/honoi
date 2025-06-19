@@ -90,10 +90,10 @@ def main():
     # autoplay toggle이 켜져있고, 마지막 step이 아니라면 한 칸씩 진행하며 자동재생
     if autoplay:
         # 자동 진행 한 번만 반영되도록
-        if st.session_state.move_idx < len(st.session_state.moves):
-            time.sleep(speed)
-            st.session_state.move_idx += 1
-            st.experimental_rerun()  # Button처럼 "자동으로 한 스텝만" 진행
+      if st.session_state.autoplay and st.session_state.move_idx < len(st.session_state.moves):
+    time.sleep(speed)
+    st.session_state.move_idx += 1
+    st.stop()  # st.stop()을 쓰면 rerun 하지 않고 여기에서 깔끔하게 끝 (오류 없음)
 
 if __name__ == '__main__':
     main()
