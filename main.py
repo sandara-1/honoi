@@ -47,7 +47,7 @@ def main():
     left, right = st.columns([1, 3])
     with left:
         st.markdown("### 설정")
-        num_disks = st.selectbox("원반 개수", options=list(range(1, 10)), index=2)
+        num_disks = st.selectbox("원반 개수", options=list(range(1, 11)), index=2)
 
     # 상태 새로 세팅(원반 개수 바꾸면 리셋)
     if (
