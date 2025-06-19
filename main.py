@@ -50,6 +50,12 @@ def main():
     speed = st.sidebar.slider("자동재생 속도 (초)", 0.2, 2.0, 0.8, 0.1)
     autoplay = st.sidebar.toggle("자동재생(Play/Stop)", value=False, key="auto_toggle")
 
+    st.info(
+        "💡 **알림: 자동재생은 로컬환경에서는 매끄럽게 동작하나, "
+        "Streamlit Cloud 등 일부 서버에서는 느리거나 멈출 수 있습니다. "
+        "자동재생이 멈추면 브라우저 새로고침 후 다시 시도하거나 직접 버튼을 눌러주세요.**"
+    )
+
     # 상태 새로 세팅(원반 개수 바꾸면 리셋)
     if (
         "moves" not in st.session_state
@@ -83,9 +89,14 @@ def main():
     # ---- 자동 재생 ----
     # 마지막 단계가 아니고 autoplay가 켜져있으면 1칸씩 자동전진
     if autoplay and st.session_state.move_idx < len(st.session_state.moves):
-        time.sleep(speed)
-        st.session_state.move_idx += 1
-        st.stop()  # 안전하게 여기서 앱을 임시 멈춤 (다음 rerun에서 갱신됨)
+        try:
+            time.sleep(speed)
+            st.session_state.move_idx += 1
+            # Streamlit Cloud에서 에러날 경우 st.stop을 사용
+            st.experimental_rerun()
+        except Exception:
+            # Cloud에서는 자동재생 한 스텝이 멈출 수 있으니 안내 표시
+            st.warning("⚠️ 자동재생이 서버 정책 등으로 인해 중단되었습니다. '다음' 버튼을 눌러 직접 진행해주세요.")
 
 if __name__ == '__main__':
     main()
