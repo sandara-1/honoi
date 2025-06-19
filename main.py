@@ -1,7 +1,6 @@
 import streamlit as st
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-import time
 
 DISK_COLORS = ['skyblue', 'salmon', 'lightgreen', 'khaki', 'plum', 'lightcoral', 'lightseagreen', 'gold']
 
@@ -45,14 +44,10 @@ def draw_towers(towers, num_disks, move_count):
 def main():
     st.title("🗼 하노이의 탑 시각화")
 
-    # 왼쪽 컬럼을 설정 영역으로 사용
     left, right = st.columns([1, 3])
-
     with left:
         st.markdown("### 설정")
         num_disks = st.selectbox("원반 개수", options=list(range(2, 8)), index=2)
-        speed = st.slider("자동재생 속도 (초)", 0.2, 2.0, 0.8, 0.1)
-        autoplay = st.toggle("자동재생(Play/Stop)", value=False, key="auto_toggle")
 
     # 상태 새로 세팅(원반 개수 바꾸면 리셋)
     if (
@@ -64,7 +59,6 @@ def main():
         st.session_state.move_idx = 0
         st.session_state.num_disks = num_disks
 
-    # 현재 towers 상태 복원
     towers = initialize_towers(num_disks)
     for i in range(st.session_state.move_idx):
         from_idx, to_idx = st.session_state.moves[i]
@@ -84,12 +78,6 @@ def main():
             if st.button("다음 ▶️", disabled=st.session_state.move_idx == len(st.session_state.moves)):
                 if st.session_state.move_idx < len(st.session_state.moves):
                     st.session_state.move_idx += 1
-
-    # ---- 자동 재생 ----
-    if autoplay and st.session_state.move_idx < len(st.session_state.moves):
-        time.sleep(speed)
-        st.session_state.move_idx += 1
-        st.stop()  # 안전하게 여기서 앱을 임시 멈춤 (다음 rerun에서 갱신됨)
 
 if __name__ == '__main__':
     main()
