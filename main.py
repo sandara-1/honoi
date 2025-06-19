@@ -1,7 +1,7 @@
-# streamlit run hanoi_streamlit.py로 실행
 import streamlit as st
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+import time
 
 DISK_COLORS = ['skyblue', 'salmon', 'lightgreen', 'khaki', 'plum', 'lightcoral', 'lightseagreen', 'gold']
 
@@ -45,41 +45,55 @@ def draw_towers(towers, num_disks, move_count):
     st.pyplot(fig)
     plt.close(fig)
 
-
 def main():
-    st.title("🗼 하노이의 탑 시각화 ")
-    num_disks = st.sidebar.slider("원반 개수", 2, 7, 4)
+    st.title("🗼 하노이의 탑 시각화")
 
-    # session_state를 통해 상태 저장
-    if "moves" not in st.session_state or st.session_state.num_disks != num_disks:
+    # selectbox로 원반 개수 선택
+    num_disks = st.sidebar.selectbox("원반 개수", options=list(range(2, 8)), index=2)
+    speed = st.sidebar.slider("자동 재생 속도 (초)", 0.2, 2.0, 0.8, 0.1)  # 속도 조절
+
+    autoplay = st.sidebar.toggle("자동재생(Play/Stop)", value=False)
+
+    # 상태 관리
+    if (
+        "moves" not in st.session_state
+        or st.session_state.get("num_disks", None) != num_disks
+    ):
         st.session_state.towers = initialize_towers(num_disks)
         st.session_state.moves = hanoi_moves(num_disks, 0, 2, 1, [])
         st.session_state.move_idx = 0
         st.session_state.num_disks = num_disks
+        st.session_state.autoplay = False  # 새로 리셋시 재생 멈춤
 
     # towers 상태 복원
     towers = initialize_towers(num_disks)
     for i in range(st.session_state.move_idx):
         from_idx, to_idx = st.session_state.moves[i]
         towers[to_idx].append(towers[from_idx].pop())
-
     draw_towers(towers, num_disks, st.session_state.move_idx)
 
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        if st.button("◀️ 이전", disabled=st.session_state.move_idx == 0):
+            if st.session_state.move_idx > 0:
+                st.session_state.move_idx -= 1
 
-col1, col2, col3 = st.columns(3)
-with col1:
-    if st.button("이전", disabled=st.session_state.move_idx == 0):
-        if st.session_state.move_idx > 0:
-            st.session_state.move_idx -= 1
+    with col2:
+        st.write(f"**Step {st.session_state.move_idx} / {len(st.session_state.moves)}**")
 
-with col2:
-    st.write(f"**Step {st.session_state.move_idx} / {len(st.session_state.moves)}**")
+    with col3:
+        if st.button("다음 ▶️", disabled=st.session_state.move_idx == len(st.session_state.moves)):
+            if st.session_state.move_idx < len(st.session_state.moves):
+                st.session_state.move_idx += 1
 
-with col3:
-    if st.button("다음", disabled=st.session_state.move_idx == len(st.session_state.moves)):
+    # 자동 재생 로직
+    # autoplay toggle이 켜져있고, 마지막 step이 아니라면 한 칸씩 진행하며 자동재생
+    if autoplay:
+        # 자동 진행 한 번만 반영되도록
         if st.session_state.move_idx < len(st.session_state.moves):
+            time.sleep(speed)
             st.session_state.move_idx += 1
-
+            st.experimental_rerun()  # Button처럼 "자동으로 한 스텝만" 진행
 
 if __name__ == '__main__':
     main()
