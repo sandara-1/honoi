@@ -47,7 +47,7 @@ def draw_towers(towers, num_disks, move_count):
 
 
 def main():
-    st.title("🗼 하노이의 탑 시각화 (Streamlit 버전)")
+    st.title("🗼 하노이의 탑 시각화 ")
     num_disks = st.sidebar.slider("원반 개수", 2, 7, 4)
 
     # session_state를 통해 상태 저장
@@ -65,19 +65,21 @@ def main():
 
     draw_towers(towers, num_disks, st.session_state.move_idx)
 
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        if st.button("이전", disabled=st.session_state.move_idx == 0):
-            if st.session_state.move_idx > 0:
-                st.session_state.move_idx -= 1
-                st.experimental_rerun()
-    with col2:
-        st.write(f"**Step {st.session_state.move_idx} / {len(st.session_state.moves)}**")
-    with col3:
-        if st.button("다음", disabled=st.session_state.move_idx == len(st.session_state.moves)):
-            if st.session_state.move_idx < len(st.session_state.moves):
-                st.session_state.move_idx += 1
-                st.experimental_rerun()
+
+col1, col2, col3 = st.columns(3)
+with col1:
+    if st.button("이전", disabled=st.session_state.move_idx == 0):
+        if st.session_state.move_idx > 0:
+            st.session_state.move_idx -= 1
+
+with col2:
+    st.write(f"**Step {st.session_state.move_idx} / {len(st.session_state.moves)}**")
+
+with col3:
+    if st.button("다음", disabled=st.session_state.move_idx == len(st.session_state.moves)):
+        if st.session_state.move_idx < len(st.session_state.moves):
+            st.session_state.move_idx += 1
+
 
 if __name__ == '__main__':
     main()
