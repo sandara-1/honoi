@@ -45,10 +45,14 @@ def draw_towers(towers, num_disks, move_count):
 def main():
     st.title("🗼 하노이의 탑 시각화")
 
-    st.sidebar.header("설정")
-    num_disks = st.sidebar.selectbox("원반 개수", options=list(range(2, 8)), index=2)
-    speed = st.sidebar.slider("자동재생 속도 (초)", 0.2, 2.0, 0.8, 0.1)
-    autoplay = st.sidebar.toggle("자동재생(Play/Stop)", value=False, key="auto_toggle")
+    # 왼쪽 컬럼을 설정 영역으로 사용
+    left, right = st.columns([1, 3])
+
+    with left:
+        st.markdown("### 설정")
+        num_disks = st.selectbox("원반 개수", options=list(range(2, 8)), index=2)
+        speed = st.slider("자동재생 속도 (초)", 0.2, 2.0, 0.8, 0.1)
+        autoplay = st.toggle("자동재생(Play/Stop)", value=False, key="auto_toggle")
 
     # 상태 새로 세팅(원반 개수 바꾸면 리셋)
     if (
@@ -66,22 +70,22 @@ def main():
         from_idx, to_idx = st.session_state.moves[i]
         towers[to_idx].append(towers[from_idx].pop())
 
-    draw_towers(towers, num_disks, st.session_state.move_idx)
+    with right:
+        draw_towers(towers, num_disks, st.session_state.move_idx)
 
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        if st.button("◀️ 이전", disabled=st.session_state.move_idx == 0):
-            if st.session_state.move_idx > 0:
-                st.session_state.move_idx -= 1
-    with col2:
-        st.write(f"**Step {st.session_state.move_idx} / {len(st.session_state.moves)}**")
-    with col3:
-        if st.button("다음 ▶️", disabled=st.session_state.move_idx == len(st.session_state.moves)):
-            if st.session_state.move_idx < len(st.session_state.moves):
-                st.session_state.move_idx += 1
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            if st.button("◀️ 이전", disabled=st.session_state.move_idx == 0):
+                if st.session_state.move_idx > 0:
+                    st.session_state.move_idx -= 1
+        with col2:
+            st.write(f"**Step {st.session_state.move_idx} / {len(st.session_state.moves)}**")
+        with col3:
+            if st.button("다음 ▶️", disabled=st.session_state.move_idx == len(st.session_state.moves)):
+                if st.session_state.move_idx < len(st.session_state.moves):
+                    st.session_state.move_idx += 1
 
     # ---- 자동 재생 ----
-    # 마지막 단계가 아니고 autoplay가 켜져있으면 1칸씩 자동전진
     if autoplay and st.session_state.move_idx < len(st.session_state.moves):
         time.sleep(speed)
         st.session_state.move_idx += 1
