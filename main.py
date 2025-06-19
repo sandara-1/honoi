@@ -42,7 +42,7 @@ def draw_towers(towers, num_disks, move_count):
     plt.close(fig)
 
 def main():
-    st.title("🗼 하노이의 탑 시각화")
+    st.title("🗼 하노이의 탑")
 
     left, right = st.columns([1, 3])
     with left:
